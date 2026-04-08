@@ -2,9 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import {
-  createBrowserRouter,
+  createHashRouter,
   RouterProvider,
-  useLoaderData,
 } from "react-router-dom";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -12,8 +11,8 @@ import './palette.css';
 import './index.css';
 
 import { App } from './App.tsx';
-import { Location } from "./Location.tsx";
 import { ErrorBoundary } from "./Error.tsx";
+import { LocationWrapper } from "./LocationWrapper.tsx";
 
 import locationsCSV from './locations.csv?raw';
 import { loadPreferences } from './Storage.ts';
@@ -26,7 +25,7 @@ const items = locationsCSV.trim().split('\n').slice(1).map(line => {
   return { name, slug, latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
 });
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <App />,
@@ -45,14 +44,7 @@ const router = createBrowserRouter([
     },
     element: <LocationWrapper />
   }
-], {
-  basename: import.meta.env.PROD ? "/galim" : undefined
-});
-
-function LocationWrapper() {
-  const item = useLoaderData() as typeof items[0];
-  return <Location name={item.name} slug={item.slug} latitude={item.latitude} longitude={item.longitude} />;
-}
+]);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
