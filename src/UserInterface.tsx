@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { Link } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -245,7 +246,7 @@ export function WeatherCard ({ name, slug, weatherData, onToggleFavorite }: Weat
             >
                 <FontAwesomeIcon icon={isFavorite ? faStarSolid : faStarRegular} />
             </button>
-            <a href={`/${slug}`}><h2 className="card-title">{ name }</h2></a>
+            <Link to={`/${slug}`}><h2 className="card-title">{ name }</h2></Link>
             {weatherData ? (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div className="card-description" style={{ flex: 1 }}>
