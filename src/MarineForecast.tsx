@@ -8,7 +8,7 @@ import Plot from 'react-plotly.js';
 const url = "https://marine-api.open-meteo.com/v1/marine";
 
 
-interface HourlyMarineData {
+export interface HourlyMarineData {
     time: Date[];
     wave_height: number[];
     sea_surface_temperature: number[];
@@ -22,7 +22,7 @@ interface HourlyMarineData {
     wind_wave_period: number[];
 }
 
-function useHourlyMarine(latitude: number, longitude: number) {
+export function useHourlyMarine(latitude: number, longitude: number) {
     const [marineData, setMarineData] = useState<HourlyMarineData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);

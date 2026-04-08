@@ -6,7 +6,7 @@ import { Header, Footer } from './UserInterface'
 import type { WeatherProps } from './utils'
 import { CurrentWeather, HourlyWeatherForecast, WeeklyForecast } from './WeatherForecast'
 import { useWeatherForLocations } from './WeatherHooks'
-import { SwimmerMarineForecast, SurferMarineForecast } from './MarineForecast'
+import { SwimmerMarineForecast, SurferMarineForecast, useHourlyMarine } from './MarineForecast'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -80,10 +80,32 @@ function FilterControls({ userTypes, onChange }: { userTypes: number[], onChange
 export function Location({ name, slug, latitude, longitude }: WeatherProps) {
   const location = useMemo(() => [{ name, slug, latitude, longitude }], [name, slug, latitude, longitude]);
   const { weatherData, loading, error } = useWeatherForLocations(location);
+  const { marineData } = useHourlyMarine(latitude, longitude);
   const [userTypes, setUserTypes] = useState<number[]>(() => loadPreferences().userTypes);
 
   const isSwimmer = userTypes.includes(1);
   const isSurfer = userTypes.includes(2);
+
+  const currentMarine = useMemo(() => {
+    if (!marineData) return null;
+    const now = new Date();
+    let closestIdx = 0;
+    let minDiff = Math.abs(now.getTime() - marineData.time[0].getTime());
+    for (let i = 1; i < marineData.time.length; i++) {
+      const diff = Math.abs(now.getTime() - marineData.time[i].getTime());
+      if (diff < minDiff) { minDiff = diff; closestIdx = i; }
+    }
+    return {
+      wave_height: marineData.wave_height[closestIdx],
+      sea_surface_temperature: marineData.sea_surface_temperature[closestIdx],
+      wave_direction: marineData.wave_direction[closestIdx],
+      wave_period: marineData.wave_period[closestIdx],
+      swell_wave_height: marineData.swell_wave_height[closestIdx],
+      swell_wave_period: marineData.swell_wave_period[closestIdx],
+      swell_wave_direction: marineData.swell_wave_direction[closestIdx],
+      wind_wave_height: marineData.wind_wave_height[closestIdx],
+    };
+  }, [marineData]);
 
   return (
     <>
@@ -131,6 +153,9 @@ export function Location({ name, slug, latitude, longitude }: WeatherProps) {
             longitude={longitude}
             data={weatherData[0] || null}
             loading={loading}
+            currentMarine={currentMarine}
+            isSwimmer={isSwimmer}
+            isSurfer={isSurfer}
           />
         </div>
 

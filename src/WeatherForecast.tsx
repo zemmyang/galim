@@ -476,12 +476,28 @@ export function HourlyWeatherForecast ({ latitude, longitude }: WeatherProps) {
       </div>
     </div>
   );
-};interface CurrentWeatherProps extends WeatherProps {
-  data?: CurrentWeatherData | null;
-  loading?: boolean;
+};
+
+interface CurrentMarineData {
+  wave_height: number;
+  sea_surface_temperature: number;
+  wave_direction: number;
+  wave_period: number;
+  swell_wave_height: number;
+  swell_wave_period: number;
+  swell_wave_direction: number;
+  wind_wave_height: number;
 }
 
-export function CurrentWeather ({ data, loading }: CurrentWeatherProps) {
+interface CurrentWeatherProps extends WeatherProps {
+  data?: CurrentWeatherData | null;
+  loading?: boolean;
+  currentMarine?: CurrentMarineData | null;
+  isSwimmer?: boolean;
+  isSurfer?: boolean;
+}
+
+export function CurrentWeather ({ data, loading, currentMarine, isSwimmer, isSurfer }: CurrentWeatherProps) {
   if (loading) {
     return (
       <div>
@@ -552,6 +568,41 @@ export function CurrentWeather ({ data, loading }: CurrentWeatherProps) {
         <span>☀️ Sunrise: {data.sunrise.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         <span>🌅 Sunset: {data.sunset.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
       </div>
+      {currentMarine && (isSwimmer || isSurfer) && (
+        <div style={{
+          borderTop: '1px solid var(--color-divider)',
+          marginTop: '1rem',
+          paddingTop: '1rem',
+        }}>
+          {isSwimmer && (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '2rem',
+              color: 'var(--color-text-secondary)',
+              fontSize: '0.95rem',
+              marginBottom: isSurfer ? '0.5rem' : 0,
+            }}>
+              <span>🌊 Waves: {currentMarine.wave_height.toFixed(1)} m</span>
+              <span>🌡️ Sea Temp: {currentMarine.sea_surface_temperature.toFixed(1)}°C</span>
+            </div>
+          )}
+          {isSurfer && (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '2rem',
+              color: 'var(--color-text-secondary)',
+              fontSize: '0.95rem',
+              flexWrap: 'wrap',
+            }}>
+              <span>🌊 Swell: {currentMarine.swell_wave_height.toFixed(1)} m @ {currentMarine.swell_wave_period.toFixed(0)}s</span>
+              <span>💨 Wind waves: {currentMarine.wind_wave_height.toFixed(1)} m</span>
+              <span>🧭 Direction: {getCardinalDirection(currentMarine.swell_wave_direction)}</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
